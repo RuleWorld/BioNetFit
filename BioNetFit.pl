@@ -383,6 +383,7 @@ my %var_defaults = (
 
 		# Store any model lines containing suffixes or scan parameters. Also store whether
 		# we are using an ode solver
+		print "\n";
 		for (@new_model) {
 			next if /^#/;
 			#print $_;
@@ -1650,8 +1651,9 @@ sub run_analyze($$$$) {
 				# Go to next experimental timepoint.
 				$j++;
 			}
+			print "all sum: $perm_model_diff[$perm]{$root_filename}\n";
 			if ($perm_p1 == 1) {
-				#print "all sum: $perm_model_diff[$perm]{$root_filename}\n";
+				print "all sum: $perm_model_diff[$perm]{$root_filename}\n";
 			}
 		}
 	}
@@ -2295,7 +2297,7 @@ sub write_all_summary($$$) {
 	#printf CONS "%-16s", "Permutation";
 	#printf CONS " %-12s", "Chi-Sq";
 
-	printf CONS "%-1s",  "Permutation";
+	printf CONS "%-1s",  "#Permutation";
 	printf CONS " %-1s", "Chi-Sq";
 
 	foreach (@$var_names_ref) {
