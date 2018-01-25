@@ -182,6 +182,7 @@ my %var_defaults = (
 	max_walltime            => "08:00:00",
 	walltime_limit			=> "240:00:00",
 	cluster_parallel        => 4,
+	norm_to_max				=> 0,
 );
 
 #############################################################
@@ -385,7 +386,7 @@ my %var_defaults = (
 		for (@new_model) {
 			next if /^#/;
 			#print $_;
-		       if (/suffix=>(“|’|”|’|"|')\w+(“|’|”|’|"|')/i) {
+			   if (/suffix=>(“|’|”|’|"|')\w+(“|’|”|’|"|')/i) {
 				push @suffix_lines, $_;
 				#print 2;
 			}
@@ -406,7 +407,7 @@ my %var_defaults = (
 				#print $suffix_line;
 				  if ( $suffix_line =~ /suffix=>(“|’|”|’|")$_(“|’|”|’|")/ ){
 					$num_name_matches += 1;
-				   	#print 1;
+					#print 1;
 				  }
 			}
 		}
@@ -1367,6 +1368,23 @@ sub run_analyze($$$$) {
 					$sim[0]{$col} = 1;
 				}
 			}
+
+			if ($values_ref->{norm_to_max}) {
+				foreach my $col ( @{ $expcolumns->{$root_filename} } ) {
+					next if ( $col =~ /_SD$/ || $col eq $control_col);
+					my @tmp_arr = ();
+					for my $j (0 .. $#sim) {
+						push @tmp_arr, $sim[$j]{$col};
+					}
+					my $kmax = max @tmp_arr;
+					foreach my $mcol ( @{ $expcolumns->{$root_filename} } ) {
+						next if !( $mcol eq $col || $mcol eq $col."_SD");
+						for my $i (0 .. $#sim) {
+								$sim[$i]{$mcol} = $sim[$i]{$mcol} / $kmax;
+						}
+					}
+				}
+			}
 			
 			#next if ($skipsim);
 			
@@ -1536,7 +1554,7 @@ sub run_analyze($$$$) {
 
 			# Calculate difference sums for each time step.
 			my $j = 0;    # $j loops through experimental time points
-			              # $i will loop through simulation time points
+						  # $i will loop through simulation time points
 			for ( my $i = 0 ; $i < @sim ; $i++ ) {
 
 				my $line_sum = 0;
@@ -2185,7 +2203,7 @@ sub load_all_summaries($) {
 		( $var_names_ref, $var_data_ref ) = read_summary("$job_dir/$file");
 		$file =~ /^(\d+)_/;
 		if ($1) {    #TODO What is this?
-			         #map {$_->[0] .= "_gen$1"} @$var_data_ref;
+					 #map {$_->[0] .= "_gen$1"} @$var_data_ref;
 		}
 		push @all_summaries, @$var_data_ref;
 	}
@@ -5772,28 +5790,28 @@ sub submit_qsub_job($$) {
 }
 
 sub average{
-        my($data) = @_;
-        if (not @$data) {
-                die("Empty arrayn");
-        }
-        my $total = 0;
-        foreach (@$data) {
-                $total += $_;
-        }
-        my $average = $total / @$data;
-        return $average;
+		my($data) = @_;
+		if (not @$data) {
+				die("Empty arrayn");
+		}
+		my $total = 0;
+		foreach (@$data) {
+				$total += $_;
+		}
+		my $average = $total / @$data;
+		return $average;
 }
 
 sub stdev{
-        my($data) = @_;
-        if(@$data == 1){
-                return 0;
-        }
-        my $average = &average($data);
-        my $sqtotal = 0;
-        foreach(@$data) {
-                $sqtotal += ($average-$_) ** 2;
-        }
-        my $std = ($sqtotal / (@$data-1)) ** 0.5;
-        return $std;
+		my($data) = @_;
+		if(@$data == 1){
+				return 0;
+		}
+		my $average = &average($data);
+		my $sqtotal = 0;
+		foreach(@$data) {
+				$sqtotal += ($average-$_) ** 2;
+		}
+		my $std = ($sqtotal / (@$data-1)) ** 0.5;
+		return $std;
 }
