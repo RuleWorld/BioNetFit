@@ -1352,6 +1352,8 @@ sub run_analyze($$$$) {
 			if ($values_ref->{divide_by_init}) {
 				foreach my $col ( @{ $expcolumns->{$root_filename} } ) {
 					next if ( $col =~ /_SD$/ || $col eq $control_col);
+					# columns that begin with NaN are not divided by the initial value
+					next if ( $exp[0]{$col} eq "NaN");
 					if ($sim[0]{$col} == 0) {
 						$sim[0]{$col} = 1e-6;
 						#show_output "die", "Error: You told BioNetFit to divide by equilibrium, but the equilbrium value for $col is $sim[0]{$col} in $perm_filename. We cannot divide by zero. Quitting.\n";
@@ -1359,7 +1361,7 @@ sub run_analyze($$$$) {
 						#$sim[0]{$col} = 1;
 						
 					}
-					for (my $i = 1; $i < @_; $i++) {
+					for (my $i = 1; $i < @sim; $i++) {
 						$sim[$i]{$col} = $sim[$i]{$col}/$sim[0]{$col};
 					}
 					$sim[0]{$col} = 1;
