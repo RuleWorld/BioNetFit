@@ -397,6 +397,8 @@ my %var_defaults = (
 			}
 			$values_ref->{ode} = 1
 			  if ( /^\s*simulate.+method=>(“|’|”|’|")ode(“|’|”|’|")/i || /^simulate_ode/i );
+			$values_ref->{ssa} = 1
+			  if ( /^\s*simulate.+method=>(“|’|”|’|")ssa(“|’|”|’|")/i || /^simulate_ssa/i );
 			die "Error: It looks like you have a prefix specified in your model action command. This causes BioNetFit to get confused. Please use only suffixes, which must correspond to .exp filenames.\n\n"
 			  if (/prefix=>(“|’|”|’|")\w+(“|’|”|’|")/i);
 		}
@@ -3840,7 +3842,7 @@ sub generate_model_set_files($$$$$) {
 		close OUT;
 	}
 
-	if ( $values_ref->{ode} ) {
+	if ( $values_ref->{ode} || $values_ref->{ssa} ) {
 		my $gen_net_cmd_found = 0;
 		my $gen_net_complete  = 0;
 
