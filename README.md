@@ -1,3 +1,6 @@
+### Notice
+This Perl version of BioNetFit is deprecated, but remains available for archival purposes. The new version of BioNetFit is available at https://github.com/lanl/PyBNF.
+
 ### BioNetFit
 BioNetFit is a general-purpose fitting program for rule-based models written in the BioNetGen language. 
 
